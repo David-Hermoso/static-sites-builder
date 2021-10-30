@@ -1,6 +1,6 @@
 {
   "name": "static-sites-builder",
-  "version": "1.0.0",
+  "version": "1.0.5",
   "description": "Node JS script for build static websites.",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,7 @@
   "keywords": [],
   "author": "David Hermoso",
   "license": "MIT",
-  "devDependencies": {
+  "dependencies": {
     "@minify-html/js": "^0.6.10",
     "autoprefixer": "^10.3.7",
     "concat": "^1.0.3",

@@ -7,31 +7,32 @@ const jsdom = require("jsdom");
 const {JSDOM} = jsdom;
 const mkdirp = require('mkdirp');
 const minifyHtml = require("@minify-html/js");
-let sourceHTML = fs.readFileSync("src/index.html").toString();
-let sourceSCSS = fs.readFileSync("src/styles/main.scss");
-let dom = new JSDOM(sourceHTML, {runScripts: "dangerously"});
+let sourceHTML;
+let dom;
+let sourceSCSS
 const sass = require('node-sass');
 const dotenv = require('dotenv');
 const outputDir = 'dist';
 let languages = ['en'];
-let translationsPath = 'src/assets/i18n';
+let translationsPath;
 
 
 build();
 
 function build() {
   dotenv.config();
-
   if (!process.env.html) {
     console.info('*********************');
     console.info('I need to know which is the HTML source file you wanna use. I am using the default one: "src/index.html"');
     console.info('\nIn order to let me now another one, I need an environment variable called html with the relative path to it.');
     console.info('Eg: html=src/map.html');
     console.info('*********************\n\n');
+    sourceHTML = fs.readFileSync('src/index.html').toString();
   } else {
     sourceHTML = fs.readFileSync(process.env.html).toString();
-    dom = new JSDOM(sourceHTML, {runScripts: "dangerously"});
   }
+
+  dom = new JSDOM(sourceHTML, {runScripts: "dangerously"});
 
 
   if (!process.env.scss) {
@@ -40,6 +41,7 @@ function build() {
     console.info('\nIn order to let me now another one, I need an environment variable called scss with the relative path to it.');
     console.info('Eg: scss=src/styles/main.scss');
     console.info('*********************\n\n');
+    sourceSCSS = fs.readFileSync("src/styles/main.scss");
   } else {
     sourceSCSS = fs.readFileSync(process.env.scss);
   }
@@ -62,9 +64,11 @@ function build() {
     console.info('\nIn order to let me now your desired ones, I need an environment variable called languages with a list of languages codes');
     console.info('Eg: translations=src/assets/my-translations/');
     console.info('*********************\n\n');
+    translationsPath = 'src/assets/i18n';
   } else {
-    translationsPath = JSON.parse(process.env.translations);
+    translationsPath = process.env.translations;
   }
+
 
   try {
     fs.rmSync(outputDir, {recursive: true, force: true});
@@ -78,7 +82,9 @@ function build() {
       });
 
       comeSassToCSS();
-      renameCssFile()
+      renameCssFile();
+      finalMessage();
+
     });
   } catch (e) {
     console.info('****')
@@ -144,4 +150,10 @@ function getPageTitle(translations) {
   titleElement.text = translations.title;
 
   return titleElement;
+}
+
+function finalMessage() {
+  console.info('** CONGRATULATIONS! **')
+  console.info('Your fancy static website is built!');
+  console.info('Check dist/ directory.');
 }
